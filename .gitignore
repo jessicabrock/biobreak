@@ -1,0 +1,4 @@
+*.pyc
+shhhhh.txt
+env/
+.DS_Store
