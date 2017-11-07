@@ -20,7 +20,7 @@ class Bathroom(db.Model):
     user_id = db.Column(db.Integer, nullable=True, default=0)
     active = db.Column(db.Boolean, nullable=False, default=True)
     created_dt = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now())
-    update_dt = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now())
+    update_dt = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now(), onupdate=datetime.datetime.now())
 
     def __init__(self, name, unisex=None,
                 accessible=None, changing_table=None):
@@ -81,19 +81,73 @@ class Location(db.Model):
     __tablename__ = "locations"
 
     location_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    bathroom_id = db.Column(db.Integer, b.ForeignKey('bathrooms.bathroom_id'), nullable=False)
+    bathroom_id = db.Column(db.Integer, db.ForeignKey('bathrooms.bathroom_id'), nullable=False)
     street = db.Column(db.String(155), nullable=False)
     city = db.Column(db.String(50), nullable=False)
     state_abbr = db.Column(db.String(2), nullable=False)
     country = db.Column(db.String(50), nullable=True)
-    latitude = db.Column(db.Double, nullable=False)
-    longitude = db.Column(db.Double, nullable=False)
-    directions = db.Column(db.String(512), nullable=True)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, db.CheckConstraint('latitude >= -90 and latitude <= 90'), nullable=False)
+    directions = db.Column(db.String(512), db.CheckConstraint('latitude >= -180 and latitude <= 180'), nullable=True)
     # Define relationship to bathrooms
     bathrooms = db.relationship('Bathroom')
-    CheckConstraint('latitude >= -90 and latitude <= 90', name='checklat')
-    CheckConstraint('longitude >= -180 and longitude <= 180', name='checklng')
 
+    # alternative method for check constraints
+    # __table_args__ = (
+    #     db.CheckConstraint('latitude >= -90 and latitude <= 90', name='checklat'),
+    #     db.CheckConstraint('longitude >= -180 and longitude <= 180', name='checklng'), {})
+
+    def __repr__(self):
+        """Provide useful representation when printed."""
+        return"<Location location_id={} bathroom_id={} street={} city={} state={} latitude={} longitude={}".format(self.location_id, self.bathroom_id, self.street, self.city, self.state_abbr, self.latitude, self.longitude)
+
+        """
+            No __init__ location should be created from 'add_bathroom_loc' method in Bathroom class
+        """
+
+class Comment(db.Model):
+    """Comments table"""
+    __tablename__ = "comments"
+
+    comment_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    bathroom_id = db.Column(db.Integer, db.ForeignKey('bathrooms.bathroom_id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    comment = db.Column(db.String(512), nullable=False)
+    # Define relationship to bathrooms and users
+    bathrooms = db.relationship('Bathroom')
+    users = db.relationship('User')
+
+    def __init__(self, bathroom_id, user_id, comment):
+        """Inital values for comments"""
+        self.bathroom_id = bathroom_id
+        self.user_id = user_id
+        self.comment = comment
+
+    def __repr__(self):
+        """Provide useful representation when printed."""
+        return"<Comment comment_id={} bathroom_id={} user_id={} comment={}".format(self.comment_id, self.bathroom_id, self.user_id, self.comment)
+
+class Rating(db.Model):
+    """Ratings table"""
+    __tablename__ = 'ratings'
+
+    rating_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    bathroom_id = db.Column(db.Integer, db.ForeignKey('bathrooms.bathroom_id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    score = db.Column(db.Integer, db.CheckConstraint('score > 0 and score <= 5'), nullable=False)
+    # Define relationship to bathrooms and users
+    bathrooms = db.relationship('Bathroom')
+    users = db.relationship('User')
+
+    def __init__(self, bathroom_id, user_id, score):
+        """Initial values for ratings"""
+        self.bathroom_id = bathroom_id
+        self.user_id = user_id
+        self.score = score
+
+    def __repr__(self):
+        """Provide useful representation when printed."""
+        return"<Rating rating_id={} bathroom_id={} user_id={} score={}".format(self.rating_id, self.bathroom_id, self.user_id, self.score)
 
 
 ##############################################################################
