@@ -10,6 +10,16 @@ db = SQLAlchemy()
 
 class Bathroom(db.Model):
     """Bathroom table"""
+
+    """
+>>> Bathroom('sf city hall')
+<Bathroom bathroom_id=None name=sf city hall>
+
+>>> Bathroom()
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: __init__() takes at least 2 arguments (1 given)
+    """
     __tablename__ = "bathrooms"
 
     bathroom_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
@@ -38,8 +48,21 @@ class Bathroom(db.Model):
 
 class User(db.Model):
     """Users table"""
+
+    """
+>>> User('Lana','Del Rey','lana.delrey@google.com','letmein')
+<User user_id=None fname=Lana lname=Del Rey email=lana.delrey@google.com display_name=None>
+
+>>> User(email='mary.mcgoo@hotmail.com')
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: __init__() takes at least 5 arguments (2 given)
+
+
+    """
     __tablename__ = "users"
 
+    # function needs to be defined before being referenced
     def default_fname(context):
         """default display_name if not provided"""
         return context.current_parameters.get('fname')
@@ -78,6 +101,14 @@ class User(db.Model):
 
 class Location(db.Model):
     """Locations table"""
+
+    """
+>>> Location(1,'683 Sutter Ave.','San Francisco','CA',37.773972, -122.431297)
+<Location location_id=None bathroom_id=1 street=683 Sutter Ave. city=San Francisco state=CA latitude=37.773972 longitude=-122.431297
+
+
+
+    """
     __tablename__ = "locations"
 
     location_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
@@ -86,9 +117,9 @@ class Location(db.Model):
     city = db.Column(db.String(50), nullable=False)
     state_abbr = db.Column(db.String(2), nullable=False)
     country = db.Column(db.String(50), nullable=True)
-    latitude = db.Column(db.Float, nullable=False)
-    longitude = db.Column(db.Float, db.CheckConstraint('latitude >= -90 and latitude <= 90'), nullable=False)
-    directions = db.Column(db.String(512), db.CheckConstraint('latitude >= -180 and latitude <= 180'), nullable=True)
+    latitude = db.Column(db.Float, db.CheckConstraint('latitude >= -90 and latitude <= 90'), nullable=False)
+    longitude = db.Column(db.Float, db.CheckConstraint('longitude >= -180 and longitude <= 180'), nullable=False)
+    directions = db.Column(db.String(512), nullable=True)
     # Define relationship to bathrooms
     bathrooms = db.relationship('Bathroom')
 
@@ -96,6 +127,17 @@ class Location(db.Model):
     # __table_args__ = (
     #     db.CheckConstraint('latitude >= -90 and latitude <= 90', name='checklat'),
     #     db.CheckConstraint('longitude >= -180 and longitude <= 180', name='checklng'), {})
+
+    def __init__(self, bathroom_id, street, city, state_abbr, latitude, longitude, country=None, directions=None):
+        self.bathroom_id = bathroom_id
+        self.street = street
+        self.city = city
+        self.state_abbr = state_abbr
+        self.country = country
+        self.latitude = latitude
+        self.longitude = longitude
+        self.directions = directions
+
 
     def __repr__(self):
         """Provide useful representation when printed."""
