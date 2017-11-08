@@ -57,8 +57,6 @@ class User(db.Model):
 Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
 TypeError: __init__() takes at least 5 arguments (2 given)
-
-
     """
     __tablename__ = "users"
 
@@ -81,12 +79,14 @@ TypeError: __init__() takes at least 5 arguments (2 given)
         """Provide useful representation when printed."""
         return"<User user_id={} fname={} lname={} email={} display_name={}>".format(self.user_id, self.fname, self.lname, self.email, self.display_name)
 
-    def __init__(self, fname, lname, email, pword, display_name=None):
+    def __init__(self, fname, lname, email, pword,
+                display_name=None, user_id=None):
         """initial values"""
         self.fname = fname
         self.lname = lname
         self.email = email
         self.pword = self.set_password(pword)
+        self.user_id = user_id
         if display_name:
             self.display_name = display_name
 
@@ -106,8 +106,6 @@ class Location(db.Model):
 >>> Location(1,'683 Sutter Ave.','San Francisco','CA',37.773972, -122.431297)
 <Location location_id=None bathroom_id=1 street=683 Sutter Ave. city=San Francisco state=CA latitude=37.773972 longitude=-122.431297
 
-
-
     """
     __tablename__ = "locations"
 
@@ -115,18 +113,17 @@ class Location(db.Model):
     bathroom_id = db.Column(db.Integer, db.ForeignKey('bathrooms.bathroom_id'), nullable=False)
     street = db.Column(db.String(155), nullable=False)
     city = db.Column(db.String(50), nullable=False)
-    state_abbr = db.Column(db.String(2), nullable=False)
+    state_abbr = db.Column(db.String(25), nullable=False)
     country = db.Column(db.String(50), nullable=True)
-    latitude = db.Column(db.Float, db.CheckConstraint('latitude >= -90 and latitude <= 90'), nullable=False)
-    longitude = db.Column(db.Float, db.CheckConstraint('longitude >= -180 and longitude <= 180'), nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
     directions = db.Column(db.String(512), nullable=True)
     # Define relationship to bathrooms
     bathrooms = db.relationship('Bathroom')
 
-    # alternative method for check constraints
-    # __table_args__ = (
-    #     db.CheckConstraint('latitude >= -90 and latitude <= 90', name='checklat'),
-    #     db.CheckConstraint('longitude >= -180 and longitude <= 180', name='checklng'), {})
+    __table_args__ = (
+        db.CheckConstraint('latitude >= -90 and latitude <= 90', name='checklat'),
+        db.CheckConstraint('longitude >= -180 and longitude <= 180', name='checklng'), {})
 
     def __init__(self, bathroom_id, street, city, state_abbr, latitude, longitude, country=None, directions=None):
         self.bathroom_id = bathroom_id
@@ -199,7 +196,7 @@ def connect_to_db(app):
     """Connect the database to our Flask app."""
 
     # Configure to use our PostgreSQL database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///bathrooms'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///testdb'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_ECHO'] = True
     db.app = app
