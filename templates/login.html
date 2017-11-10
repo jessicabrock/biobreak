@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Login or Create an Account{% endblock %}
+{% block content %}
+  <div id = "login_msg">
+    <!-- span used for message failed login -->
+    <span id = "span_login_msg">
+  {% for message in get_flashed_messages() %}
+    {{ message }}
+  {% endfor %}
+    </span>
+  </div>
+  <div class="form">
+    <div class="head" class="signup">
+      <div onclick="changeTab(this)" data-tab="login" class="login-tab">Login</div>
+      <div onclick="changeTab(this)" data-tab="signup" class="signup-tab">Signup</div>
+    </div>
+    <div class="body" id="form-body">
+      <div class="login">
+        <div class="form-row">
+          <form method="POST" action="/login_validate">
+          <label for="">Email</label>
+          <input id="login_email" name="login_email" type="text" placeholder="Email">
+        </div>
+        <div class="form-row">
+          <label for="">Password</label>
+          <input id="login_password" name="login_password" type="password" placeholder="Password">
+        </div>
+        <div class="rem-row">
+          <input type="checkbox" id="rem">
+          <label for="rem">Remember me</label>
+        </div>
+        <div class="form-row">
+          <button onclick="return validateForm()">Login</button>
+        </div>
+      </form>
+        <div class="row">
+          <span>OR</span>
+        </div>
+        <div class="footer">
+          <!-- <div class="reddit-auth">
+           <i class="fa fa-reddit"></i> Login with Reddit
+          </div> -->
+          <div class="social-form reddit">
+            <i class="fa fa-reddit"></i> Login with Reddit
+          </div>
+          <!-- <div class="social-form fa-git">
+            <i class="fa fa-git"></i> Login with GitHub
+          </div> -->
+          <!-- <div class="social-form fb">
+            <i class="fa fa-facebook"></i> Login with Facebook
+          </div>
+          <div class="social-form google">
+            <i class="fa fa-google"></i> Login with Google
+          </div> -->
+        </div>
+      </div>
+      <div class="signup">
+        <div class="form-row">
+          <label for="">Name</label>
+          <input type="text" placeholder="Name">
+        </div>
+        <div class="form-row">
+          <label for="">Email</label>
+          <input type="text" placeholder="Email">
+        </div>
+        <div class="form-row">
+          <label for="">Password</label>
+          <input type="password" placeholder="Password">
+        </div>
+        <div class="form-row">
+          <label for="">Retype Password</label>
+          <input type="password" placeholder="Password">
+        </div>
+        <div class="rem-row">
+          <input type="checkbox" id="agr">
+          <label for="agr">Agree terms &amp; conditions.</label>
+        </div>
+        <div class="form-row">
+          <button>Sign up</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+      "use strict";
+
+      function changeTab(ref){
+      try {
+        if(ref.getAttribute("data-tab") == "login") {
+          document.getElementById("form-body").classList.remove('active');
+        ref.parentNode.classList.remove('signup');
+      } else {
+          document.getElementById("form-body").classList.add('active');
+          ref.parentNode.classList.add('signup');
+      }
+      } catch(msg) {
+          console.log(msg);
+      }
+    }
+
+    function validateForm(){
+      let email = $('#login_email').val();
+      let password = $('#login_password').val();
+      let rem = $('#rem').is(':checked') /* checked or unchecked */
+
+    if (email == "" || password == "") {
+      $('#span_login_msg').text("Email/password required.")
+      return false;
+    }
+    else {
+      return true;
+    }
+  }
+
+
+  </script>
+{% endblock %}

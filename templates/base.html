@@ -1,0 +1,22 @@
+<html>
+<head>
+    <title>{% block title %}TITLE GOES HERE{% endblock %}</title>
+    <link rel="stylesheet"
+          href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.css"/>
+    <link rel="stylesheet" href="/static/styles.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+
+<body>
+<div class="container">
+    <h1 id="logo">Bio Break </h1>
+  <!-- This is where the main content goes. -->
+  {% block content %}
+      BODY OF PAGE GOES HERE
+  {% endblock %}
+</div>
+  <footer class="foot">
+      copyright &copy; 2017 BioBreak
+  </footer>
+</body>
+</html>

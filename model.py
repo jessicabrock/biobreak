@@ -23,7 +23,7 @@ TypeError: __init__() takes at least 2 arguments (1 given)
     __tablename__ = "bathrooms"
 
     bathroom_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    name = db.Column(db.String(50), nullable=False)
+    name = db.Column(db.String(150), nullable=False)
     unisex = db.Column(db.Boolean, nullable=True, default=False)
     accessible = db.Column(db.Boolean, nullable=True, default=False)
     changing_table = db.Column(db.Boolean, nullable=True, default=False)
@@ -31,6 +31,7 @@ TypeError: __init__() takes at least 2 arguments (1 given)
     active = db.Column(db.Boolean, nullable=False, default=True)
     created_dt = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now())
     update_dt = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now(), onupdate=datetime.datetime.now())
+    locations = db.relationship('Location', uselist=False)
 
     def __init__(self, name, unisex=None,
                 accessible=None, changing_table=None):
@@ -95,9 +96,18 @@ TypeError: __init__() takes at least 5 arguments (2 given)
         self.pwdhash = hashpw(pword, gensalt())
         return self.pwdhash
 
-    def verify_password(self, pword):
+    @staticmethod
+    def verify_password(email, pword):
         """verify user password"""
-        return ".FIXME"
+        pwdhash = hashpw(pword.encode('utf-8'), gensalt())
+
+        cnt = db.session.query(User).filter_by(email=email,
+                                                pword = pwdhash).count()
+
+        if ( cnt == 1):
+            return True
+        else:
+            return False
 
 class Location(db.Model):
     """Locations table"""
@@ -113,11 +123,11 @@ class Location(db.Model):
     bathroom_id = db.Column(db.Integer, db.ForeignKey('bathrooms.bathroom_id'), nullable=False)
     street = db.Column(db.String(155), nullable=False)
     city = db.Column(db.String(50), nullable=False)
-    state_abbr = db.Column(db.String(25), nullable=False)
+    state = db.Column(db.String(50), nullable=False)
     country = db.Column(db.String(50), nullable=True)
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
-    directions = db.Column(db.String(512), nullable=True)
+    directions = db.Column(db.String(2000), nullable=True)
     # Define relationship to bathrooms
     bathrooms = db.relationship('Bathroom')
 
@@ -125,11 +135,11 @@ class Location(db.Model):
         db.CheckConstraint('latitude >= -90 and latitude <= 90', name='checklat'),
         db.CheckConstraint('longitude >= -180 and longitude <= 180', name='checklng'), {})
 
-    def __init__(self, bathroom_id, street, city, state_abbr, latitude, longitude, country=None, directions=None):
+    def __init__(self, bathroom_id, street, city, state, latitude, longitude, country=None, directions=None):
         self.bathroom_id = bathroom_id
         self.street = street
         self.city = city
-        self.state_abbr = state_abbr
+        self.state = state
         self.country = country
         self.latitude = latitude
         self.longitude = longitude
@@ -138,7 +148,7 @@ class Location(db.Model):
 
     def __repr__(self):
         """Provide useful representation when printed."""
-        return"<Location location_id={} bathroom_id={} street={} city={} state={} latitude={} longitude={}".format(self.location_id, self.bathroom_id, self.street, self.city, self.state_abbr, self.latitude, self.longitude)
+        return"<Location location_id={} bathroom_id={} street={} city={} state={} latitude={} longitude={}".format(self.location_id, self.bathroom_id, self.street, self.city, self.state, self.latitude, self.longitude)
 
         """
             No __init__ location should be created from 'add_bathroom_loc' method in Bathroom class
@@ -151,7 +161,7 @@ class Comment(db.Model):
     comment_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     bathroom_id = db.Column(db.Integer, db.ForeignKey('bathrooms.bathroom_id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-    comment = db.Column(db.String(512), nullable=False)
+    comment = db.Column(db.String(1024), nullable=False)
     # Define relationship to bathrooms and users
     bathrooms = db.relationship('Bathroom')
     users = db.relationship('User')
