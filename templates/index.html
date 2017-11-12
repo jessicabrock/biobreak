@@ -6,8 +6,17 @@
     <table id="nav-top">
         <tr>
             <td>
-                <a href="#">Log In or Create Account</a>
+                <a href="/login">Log In or Create Account</a>
             </td>
         </tr>
     </table>
+    <div id="search">
+        <div id="subhead">
+            Find a gender neutral, disability accessible or changing table bathroom
+        </div>
+        <form id="frmSearch" method="GET" action="/">
+            <input id="tbSearch" type="textbox" name="txtSearch" size="50">
+            <input id="btSubmit" type="button" name="btnSubmit" value="Flush">
+        </form>
+    </div>
 {% endblock %}

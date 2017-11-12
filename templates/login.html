@@ -2,6 +2,9 @@
 
 {% block title %}Login or Create an Account{% endblock %}
 {% block content %}
+  <div id="nav-home">
+    <a href="/">Home</a>
+  </div>
   <div id = "login_msg">
     <!-- span used for message failed login -->
     <span id = "span_login_msg">
@@ -18,7 +21,7 @@
     <div class="body" id="form-body">
       <div class="login">
         <div class="form-row">
-          <form method="POST" action="/login_validate">
+          <form id="frmLogin" method="POST" action="/login_validate">
           <label for="">Email</label>
           <input id="login_email" name="login_email" type="text" placeholder="Email">
         </div>
@@ -112,6 +115,23 @@
       return true;
     }
   }
+
+  jQuery.validator.setDefaults({
+  debug: true,
+  success: "valid"
+  });
+
+  $("#frmLogin").validate({
+  rules: {
+    login_email: {
+      required: true,
+      email: true
+      }
+    login_password: {
+      required: true
+    }
+         }
+});
 
 
   </script>

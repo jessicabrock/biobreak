@@ -185,3 +185,42 @@ footer {
             text-align: center;
             display: inline-block;
         }
+
+#nav-top {
+  width: 100%;
+  top: 60;
+  left: -25;
+  position: absolute;
+  text-align: right;
+}
+
+#nav-home {
+  width: 100%;
+  top: 60;
+  right: -25
+  position: absolute;
+  text-align: right;
+}
+
+div #search {
+  width: 100%;
+  top: 100;
+  left: 250;
+  position: absolute;
+}
+
+#tbSearch {
+  border-style: solid;
+  border-color: gray;
+  background-color: #eeeeee;
+}
+
+#btSubmit {
+  font-family: Helvetica, Arial, sans-serif
+  font-weight: bold;
+  color: #000000;
+}
+
+#subhead {
+  left: 40;
+}
