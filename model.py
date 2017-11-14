@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+import geoalchemy2
 from bcrypt import hashpw, gensalt
 import datetime
 from collections import defaultdict
@@ -128,6 +129,7 @@ class Location(db.Model):
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
     directions = db.Column(db.String(2000), nullable=True)
+    lnglat = db.Column(geoalchemy2.Geography(geometry_type='POINT', srid=4326))
     # Define relationship to bathrooms
     bathrooms = db.relationship('Bathroom')
 

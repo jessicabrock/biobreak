@@ -1,10 +1,10 @@
 """Main file for biobreak app"""
-import urllib
 import os
 from flask import Flask, request, render_template, flash, redirect
 import geocoder
 from flask_sqlalchemy import SQLAlchemy
-from geoalchemy2 import Geography
+from SQLAlchemy import func
+from geoalchemy2 import Geography, WKTElement
 from model import User, Bathroom, Location, Comment, Rating, db, connect_to_db
 
 CLIENT_ID = os.environ['RedditAppClientId']
@@ -13,19 +13,25 @@ GOOGLE_MAPS = os.environ['GoogleMapsAPIkey']
 REDIRECT_URI = "http://0.0.0.0:5000/reddit_callback"
 
 app = Flask(__name__)
-app.config['SECRET_KEY']='seek_rhett'
+app.config['SECRET_KEY'] = 'seek_rhett'
 
 @app.route('/')
 def index():
     """Return homepage or query results"""
     qry = request.args.get('txtSearch')
 
-    if qry == None:
-        ip = request.remote_addr
-        g = geocoder.google(ip)
-        latlng = g.latlng
-        latlng[1],latlng[0] =latlng[0],latlng[1]
-        # STOPPED reverse latlng and query db
+    if qry is None:
+        g_loc = geocoder.google("683 Sutter St., San Francisco, CA")
+        latlng = g_loc.latlng
+        latlng[1], latlng[0] = latlng[0], latlng[1]
+        print latlng
+        # query db
+      #  query = db.session.query(Location).filter(ST_Within(            Location.lnglat, 'POINT(latlng)'))
+  #      point = WKTElement('POINT({0} {1})'.format(latlng[0],latlng[1]), srid=4326)
+        point = "POINT({lat} {lng})".format(lat=latlng[1],lng=latlng[0])
+        query = db.session.query(Location).filter(func.ST_Distance_Sphere(point, Location.lnglat) < 10000).all()
+        for loc in query:
+            print loc.lnglat
 
         return render_template("index.html")
     else:
@@ -37,8 +43,7 @@ def login():
     """Sends user to the login/create account page"""
     return render_template("login.html")
 
-
-@app.route('/login_validate', methods = ['POST'])
+@app.route('/login_validate', methods=['POST'])
 def login_validate():
     """validate users login credentials"""
     email = request.form.get('login_email')
