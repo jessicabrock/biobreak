@@ -1,8 +1,9 @@
+"""model layer for application"""
+# from collections import defaultdict
+from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 import geoalchemy2
 from bcrypt import hashpw, gensalt
-import datetime
-from collections import defaultdict
 from flask import Flask
 
 # PostgreSQL database connection.
@@ -30,12 +31,15 @@ TypeError: __init__() takes at least 2 arguments (1 given)
     changing_table = db.Column(db.Boolean, nullable=True, default=False)
     user_id = db.Column(db.Integer, nullable=True, default=0)
     active = db.Column(db.Boolean, nullable=False, default=True)
-    created_dt = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now())
-    update_dt = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now(), onupdate=datetime.datetime.now())
+    created_dt = db.Column(db.DateTime, nullable=False, default=datetime.now())
+    update_dt = db.Column(db.DateTime, nullable=False, \
+        default=datetime.now(), onupdate=datetime.now())
     locations = db.relationship('Location', uselist=False)
 
-    def __init__(self, name, unisex=None,
-                accessible=None, changing_table=None):
+    def __init__(self, name,
+                 unisex=None,
+                 accessible=None,
+                 changing_table=None):
         """initial values"""
         self.name = name
         self.unisex = unisex
@@ -45,7 +49,8 @@ TypeError: __init__() takes at least 2 arguments (1 given)
 
     def __repr__(self):
         """Provide useful representation when printed."""
-        return"<Bathroom bathroom_id={} name={}>".format(self.bathroom_id, self.name)
+        return "<Bathroom bathroom_id={} name={}>".format(self.bathroom_id, \
+                self.name)
 
 
 class User(db.Model):
@@ -72,16 +77,19 @@ TypeError: __init__() takes at least 5 arguments (2 given)
     lname = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(100), nullable=False, unique=True)
     pword = db.Column(db.String(150), nullable=False)
-    display_name = db.Column(db.String(25), nullable=True, default=default_fname)
-    created_dt = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now())
+    display_name = db.Column(db.String(25), nullable=True, \
+        default=default_fname)
+    created_dt = db.Column(db.DateTime, nullable=False, default=datetime.now())
     last_login_dt = db.Column(db.DateTime, nullable=True)
     active = db.Column(db.Boolean, nullable=False, default=True)
 
     def __repr__(self):
         """Provide useful representation when printed."""
-        return"<User user_id={} fname={} lname={} email={} display_name={}>".format(self.user_id, self.fname, self.lname, self.email, self.display_name)
+        return"<User user_id={} fname={} lname={} email={} \
+            display_name={}>".format(self.user_id, self.fname, \
+            self.lname, self.email, self.display_name)
 
-    def __init__(self, fname, lname, email, pword,
+    def __init__(self, fname, lname, email, pword, \
                 display_name=None, user_id=None):
         """initial values"""
         self.fname = fname
@@ -92,10 +100,11 @@ TypeError: __init__() takes at least 5 arguments (2 given)
         if display_name:
             self.display_name = display_name
 
-    def set_password(self, pword):
+    @staticmethod
+    def set_password(pword):
         """hash user password before storing in db"""
-        self.pwdhash = hashpw(pword, gensalt())
-        return self.pwdhash
+        pwdhash = hashpw(pword.encode('utf-8'), gensalt())
+        return pwdhash
 
     @staticmethod
     def verify_password(email, pword):
@@ -103,9 +112,9 @@ TypeError: __init__() takes at least 5 arguments (2 given)
         pwdhash = hashpw(pword.encode('utf-8'), gensalt())
 
         cnt = db.session.query(User).filter_by(email=email,
-                                                pword = pwdhash).count()
+                                               pword=pwdhash).count()
 
-        if ( cnt == 1):
+        if cnt == 1:
             return True
         else:
             return False
@@ -129,15 +138,18 @@ class Location(db.Model):
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
     directions = db.Column(db.String(2000), nullable=True)
-    lnglat = db.Column(geoalchemy2.Geography(geometry_type='POINT', srid=4326))
+    lnglat = db.Column(geoalchemy2.Geometry(geometry_type='POINT', srid=4326))
     # Define relationship to bathrooms
-    bathrooms = db.relationship('Bathroom')
+    bathrooms = db.relationship("Bathroom", foreign_keys=[bathroom_id], \
+        uselist=False)
 
     __table_args__ = (
         db.CheckConstraint('latitude >= -90 and latitude <= 90', name='checklat'),
         db.CheckConstraint('longitude >= -180 and longitude <= 180', name='checklng'), {})
 
-    def __init__(self, bathroom_id, street, city, state, latitude, longitude, country=None, directions=None):
+    def __init__(self, bathroom_id, street, city, state, \
+                    latitude, longitude, country=None, \
+                    directions=None, lnglat=None):
         self.bathroom_id = bathroom_id
         self.street = street
         self.city = city
@@ -146,14 +158,17 @@ class Location(db.Model):
         self.latitude = latitude
         self.longitude = longitude
         self.directions = directions
-
+        self.lnglat = lnglat
 
     def __repr__(self):
         """Provide useful representation when printed."""
-        return"<Location location_id={} bathroom_id={} street={} city={} state={} latitude={} longitude={}".format(self.location_id, self.bathroom_id, self.street, self.city, self.state, self.latitude, self.longitude)
+        return "<Location location_id={} bathroom_id={} street={} city={} \  state={} latitude={} longitude={}".format(self.location_id, \
+            self.bathroom_id, self.street, self.city, self.state, \
+            self.latitude, self.longitude)
 
         """
-            No __init__ location should be created from 'add_bathroom_loc' method in Bathroom class
+            No __init__ location should be created from \
+            'add_bathroom_loc' method in Bathroom class
         """
 
 class Comment(db.Model):
@@ -162,7 +177,8 @@ class Comment(db.Model):
 
     comment_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     bathroom_id = db.Column(db.Integer, db.ForeignKey('bathrooms.bathroom_id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), \
+        nullable=False)
     comment = db.Column(db.String(1024), nullable=False)
     # Define relationship to bathrooms and users
     bathrooms = db.relationship('Bathroom')
@@ -176,7 +192,9 @@ class Comment(db.Model):
 
     def __repr__(self):
         """Provide useful representation when printed."""
-        return"<Comment comment_id={} bathroom_id={} user_id={} comment={}".format(self.comment_id, self.bathroom_id, self.user_id, self.comment)
+        return "<Comment comment_id={} bathroom_id={} user_id={} \
+                comment={}".format(self.comment_id, self.bathroom_id, \
+                self.user_id, self.comment)
 
 class Rating(db.Model):
     """Ratings table"""
@@ -198,7 +216,9 @@ class Rating(db.Model):
 
     def __repr__(self):
         """Provide useful representation when printed."""
-        return"<Rating rating_id={} bathroom_id={} user_id={} score={}".format(self.rating_id, self.bathroom_id, self.user_id, self.score)
+        return "<Rating rating_id={} bathroom_id={} user_id={} \
+                score={}".format(self.rating_id, self.bathroom_id, \
+                self.user_id, self.score)
 
 
 ##############################################################################
@@ -213,7 +233,6 @@ def connect_to_db(app):
     app.config['SQLALCHEMY_ECHO'] = True
     db.app = app
     db.init_app(app)
-
 
 if __name__ == "__main__":
     # As a convenience, if we run this module interactively, it will leave

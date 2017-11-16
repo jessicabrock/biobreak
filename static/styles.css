@@ -224,3 +224,17 @@ div #search {
 #subhead {
   left: 40;
 }
+
+/* map */
+#map_wrapper {
+    height: 400px;
+    width: 100%;
+    top: 200;
+    left: 200;
+    position: absolute;
+}
+
+#map_canvas {
+    width: 50%;
+    height: 100%;
+}

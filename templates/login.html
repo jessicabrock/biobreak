@@ -34,7 +34,7 @@
           <label for="rem">Remember me</label>
         </div>
         <div class="form-row">
-          <button onclick="return validateForm()">Login</button>
+          <button onclick="return validateForm1()">Login</button>
         </div>
       </form>
         <div class="row">
@@ -60,49 +60,68 @@
       </div>
       <div class="signup">
         <div class="form-row">
+          <form id="frmSign" method="POST" action="/create_acct">
           <label for="">Name</label>
-          <input type="text" placeholder="Name">
+          <input id="signFirst" name="first_name" type="text" placeholder="First Name">
+          <input id="signLast" name="last_name" type="text" placeholder="Last Name">
+          <input id="signDisplay" name="display_name" type="text" placeholder="Display Name">
         </div>
         <div class="form-row">
           <label for="">Email</label>
-          <input type="text" placeholder="Email">
+          <input id="signEmail" name="email" type="text" placeholder="Email">
         </div>
         <div class="form-row">
           <label for="">Password</label>
-          <input type="password" placeholder="Password">
+          <input id="signPassword1" name="password" type="password" placeholder="Password">
         </div>
         <div class="form-row">
           <label for="">Retype Password</label>
-          <input type="password" placeholder="Password">
+          <input id="signPassword2" type="password" placeholder="Password">
         </div>
-        <div class="rem-row">
+        <!-- <div class="rem-row">
           <input type="checkbox" id="agr">
           <label for="agr">Agree terms &amp; conditions.</label>
-        </div>
+        </div> -->
         <div class="form-row">
-          <button>Sign up</button>
+          <input type="submit" value ="Sign up" >
         </div>
+        </form>
       </div>
     </div>
   </div>
   <script>
       "use strict";
 
-      function changeTab(ref){
+      function changeTab(e){
       try {
-        if(ref.getAttribute("data-tab") == "login") {
+        if(e.getAttribute("data-tab") == "login") {
           document.getElementById("form-body").classList.remove('active');
-        ref.parentNode.classList.remove('signup');
+        e.parentNode.classList.remove('signup');
       } else {
           document.getElementById("form-body").classList.add('active');
-          ref.parentNode.classList.add('signup');
+          e.parentNode.classList.add('signup');
       }
       } catch(msg) {
           console.log(msg);
       }
     }
 
-    function validateForm(){
+    function registerUser(results) {
+      if ( results["status"] == true) {
+        $('#span_login_msg').text("You already have an account, please login.")
+      }
+      else {
+        $("#frmSign").submit();
+      }
+    }
+
+    function check_email_exists() {
+      let frmInput = $("#signEmail").val();
+      let data = {"email": frmInput}
+      $.get("/check_email_exists.json", data, registerUser);
+    }
+
+    function validateForm1(){
       let email = $('#login_email').val();
       let password = $('#login_password').val();
       let rem = $('#rem').is(':checked') /* checked or unchecked */
@@ -116,23 +135,28 @@
     }
   }
 
-  jQuery.validator.setDefaults({
-  debug: true,
-  success: "valid"
-  });
+  function validateForm2(evt){
+      evt.preventDefault();
+      let fname = $('#signFirst').val();
+      let lname = $('#signLast').val();
+      let email = $('#signEmail').val();
+      let password1 = $('#signPassword1').val();
+      let password2 = $('#signPassword2').val();
 
-  $("#frmLogin").validate({
-  rules: {
-    login_email: {
-      required: true,
-      email: true
+      if ( fname == "" || lname == "" || email == ""
+           || password1 == "" || password2 == ""){
+          $('#span_login_msg').text("Name/Email/password required.")
+      return false;
       }
-    login_password: {
-      required: true
-    }
-         }
-});
+      if (password1 != password2) {
+        $('#span_login_msg').text("Passwords do not match.")
+        return false;
+      }
 
+      check_email_exists();
 
+  }
+
+  $("#frmSign").submit(validateForm2);
   </script>
 {% endblock %}

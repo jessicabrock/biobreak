@@ -19,4 +19,62 @@
             <input id="btSubmit" type="button" name="btnSubmit" value="Flush">
         </form>
     </div>
+    <div id="map_wrapper">
+        <div id="map_canvas" class="mapping"></div>
+    </div>
+    <script>
+      "use strict";
+
+
+          function initMap(results) {
+            console.log("initMap");
+            let map = new google.maps.Map(document.getElementById('map_canvas'), {
+              zoom: 4,
+              mapTypeId: 'roadmap',
+              // user last lat/lng for center
+              center: new google.maps.LatLng(results[4]["lat"], results[4]["lng"])
+            });
+            map.setTilt(45);
+
+            let marker;
+            let position;
+            // Info Window Content
+            let infoWindowContent = [];
+            let infoWindow = new google.maps.InfoWindow();
+            for (let i = 0; i < results.length; i++) {
+                marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(results[i]["lat"], results[i]["lng"]),
+                    map: map
+                });
+
+                infoWindowContent.push('<div class="info_content">' +
+                '<h3>' + results[i]["name"] + '</h3>' +
+                '<p>' + results[i]["address"] + '</br>' +
+                results[i]["city"] + ', ' + results[i]["state"] +
+                '</br></br>' + results[i]["directions"] + '</p></div>');
+
+                // Allow each marker to have an info window
+                google.maps.event.addListener(marker, 'click', (function(marker, i) {
+                    return function() {
+                        infoWindow.setContent(infoWindowContent[i]);
+                        infoWindow.open(map, marker);
+                    }
+                })(marker, i));
+
+            }
+          }
+
+        function mapResults(results) {
+            console.log("mapResults");
+          initMap(results);
+        }
+
+        function requestData() {
+            console.log("requestData");
+          $.get("/index_maps.json", mapResults);
+        }
+
+        $( document ).ready( requestData );
+</script>
+
 {% endblock %}
