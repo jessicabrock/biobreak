@@ -10,6 +10,7 @@ from flask import Flask
 # Flask-SQLAlchemy helper library.
 db = SQLAlchemy()
 
+
 class Bathroom(db.Model):
     """Bathroom table"""
 
@@ -45,7 +46,6 @@ TypeError: __init__() takes at least 2 arguments (1 given)
         self.unisex = unisex
         self.accessible = accessible
         self.changing_table = changing_table
-
 
     def __repr__(self):
         """Provide useful representation when printed."""
@@ -109,10 +109,10 @@ TypeError: __init__() takes at least 5 arguments (2 given)
     @staticmethod
     def verify_password(email, pword):
         """verify user password"""
-        pwdhash = hashpw(pword.encode('utf-8'), gensalt())
 
         cnt = db.session.query(User).filter_by(email=email,
                                                pword=pwdhash).count()
+        # if bcrypt.checkpw(password, hashed):
 
         if cnt == 1:
             return True

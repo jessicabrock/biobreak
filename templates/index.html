@@ -14,18 +14,18 @@
         <div id="subhead">
             Find a gender neutral, disability accessible or changing table bathroom
         </div>
-        <form id="frmSearch" method="GET" action="/">
+        <form id="frmSearch" method="GET" action="/index_maps">
             <input id="tbSearch" type="textbox" name="txtSearch" size="50">
-            <input id="btSubmit" type="button" name="btnSubmit" value="Flush">
+            <input id="btSubmit" type="button" name="btnSubmit" value="Go">
         </form>
     </div>
     <div id="map_wrapper">
         <div id="map_canvas" class="mapping"></div>
     </div>
-    <script>
+    <script defer>
       "use strict";
 
-
+            // Google Maps
           function initMap(results) {
             console.log("initMap");
             let map = new google.maps.Map(document.getElementById('map_canvas'), {
@@ -66,15 +66,33 @@
 
         function mapResults(results) {
             console.log("mapResults");
-          initMap(results);
+            let data = results["data"]
+          initMap(data);
         }
 
         function requestData() {
             console.log("requestData");
-          $.get("/index_maps.json", mapResults);
+            let frmInput = $('#tbSearch').val();
+            let txt = {"searchRequest": frmInput};
+            $.get("/index_maps.json",txt, mapResults);
         }
 
+        // display maps on page load
         $( document ).ready( requestData );
+
+        // user defined search
+        $('#btSubmit').click(requestData);
+
+        // Google Places autocomplete
+        let input = document.getElementById('tbSearch');
+        // let autocomplete = new google.maps.places.Autocomplete(input,
+        //     {types: ['(cities)']});
+        let autocomplete = new google.maps.places.Autocomplete(input);
+        google.maps.event.addListener(tbSearch, 'place_changed',
+            function(){
+                let place = autocomplete.getPlace();
+      })
+
 </script>
 
 {% endblock %}

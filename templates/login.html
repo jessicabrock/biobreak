@@ -72,7 +72,8 @@
         </div>
         <div class="form-row">
           <label for="">Password</label>
-          <input id="signPassword1" name="password" type="password" placeholder="Password">
+          <input id="signPassword1" name="password" type="password"
+              placeholder="Password">
         </div>
         <div class="form-row">
           <label for="">Retype Password</label>
@@ -83,7 +84,7 @@
           <label for="agr">Agree terms &amp; conditions.</label>
         </div> -->
         <div class="form-row">
-          <input type="submit" value ="Sign up" >
+          <input id="btnSign" type="submit" value ="Sign up" >
         </div>
         </form>
       </div>
@@ -157,6 +158,6 @@
 
   }
 
-  $("#frmSign").submit(validateForm2);
+  $('#btnSign').click(validateForm2);
   </script>
 {% endblock %}

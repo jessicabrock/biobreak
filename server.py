@@ -11,11 +11,14 @@ REDDIT_CLIENT_ID = os.environ['RedditAppClientId']
 CLIENT_SECRET = os.environ['RedditSecretKey']
 GOOGLE_MAPS = os.environ['GoogleMapsAPIkey']
 REDIRECT_URI = "http://0.0.0.0:5000/reddit_callback"
+REDDIT_USER  = "datagrl"
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'seek_rhett'
+
 @app.before_request
 def before():
+    """set variables for jinja"""
     g.googlemaps = GOOGLE_MAPS
     g.reddit = REDDIT_CLIENT_ID
 
@@ -23,31 +26,6 @@ def before():
 @app.route('/')
 def index():
     """Return homepage or query results"""
-    # qry = request.args.get('txtSearch')
-
-    # if qry is None:
-    #     g_loc = geocoder.google("683 Sutter St., San Francisco, CA")
-    #     latlng = g_loc.latlng
-      #  print latlng
-      #  latlng[1], latlng[0] = latlng[0], latlng[1]
-      #  print latlng
-        # query db
-      #  query = db.session.query(Location).filter(ST_Within(            Location.lnglat, 'POINT(latlng)'))
-  #      point = WKTElement('POINT({0} {1})'.format(latlng[0],latlng[1]), srid=4326)
-        # point = "POINT({lng} {lat})".format(lat=latlng[0],lng=latlng[1])
-        # query = db.session.query(Location).filter(func.ST_Distance_Sphere( \
-        #         point, Location.lnglat) < 10000).limit(5).all()
-
-        # testing
-        # print query
-        # for loc in query:
-        #     print str(loc.longitude) + " " + str(loc.latitude)
-        #     print loc.bathrooms.name
-        #     print loc.street + " " + loc.city + ", " + loc.state
-        #     print loc.directions
-        #     print
-
-
     return render_template("index.html")
 
 
@@ -56,21 +34,25 @@ def get_maps():
     """return markers to map"""
     data = {}
     lst = []
-    address = request.args.get("txtSearch")
-    if address is None:
+    location = request.args.get("searchRequest")
+    if location == "":
         g_loc = geocoder.google("683 Sutter St., San Francisco, CA")
-        latlng = g_loc.latlng
-        point = "POINT({lng} {lat})".format(lat=latlng[0],lng=latlng[1])
-        query = db.session.query(Location).filter(func.ST_Distance_Sphere( \
-                point, Location.lnglat) < 10000).limit(5).all()
-        for rec in query:
-            data = {"lat": rec.latitude, "lng": rec.longitude, \
-                    "name": rec.bathrooms.name, "address": rec.street, \
-                    "city": rec.city, "state": rec.state, \
-                    "directions": rec.directions}
-            lst.append(data)
+    else:
+        g_loc = geocoder.google(location)
 
-    return jsonify(lst)
+    latlng = g_loc.latlng
+    point = "POINT({lng} {lat})".format(lat=latlng[0],lng=latlng[1])
+    query = db.session.query(Location).filter(func.ST_Distance_Sphere( \
+            point, Location.lnglat) < 10000).limit(5).all()
+    for rec in query:
+        data = {"lat": rec.latitude, "lng": rec.longitude, \
+                "name": rec.bathrooms.name, "address": rec.street, \
+                "city": rec.city, "state": rec.state, \
+                "directions": rec.directions}
+        lst.append(data)
+    results = {"data": lst}
+
+    return jsonify(results)
 
 @app.route('/login')
 def login():
@@ -83,12 +65,15 @@ def login_validate():
     email = request.form.get('login_email')
     password = request.form.get('login_password')
     rem = request.form.get('rem')
+    import pdb; pdb.set_trace()
+
     # check if email/password are in db
-    if User.verify_password(email, password):
-        if rem == 'checked':
-            # create cookie for user
-            pass
-        Session['user_id'] = rec.user_id
+    verify_acct = User.verify_password(email, password)
+    if verify_acct:
+        # if rem == 'checked':
+        #     # create cookie for user
+        #     pass
+        # Session['user_id'] = rec.user_id
         return redirect('/')
     else:
         msg = flash("Login Failed")
@@ -112,7 +97,8 @@ def create_acct():
 @app.route('/check_email_exists.json')
 def check_acct():
     """check if user has an existing account"""
-    email = request.args.get('email')
+    email = request.args.get("email")
+
     cnt = db.session.query(User).filter_by(email=email).count()
     if cnt > 0:
         status = {"status": True}
