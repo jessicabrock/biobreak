@@ -1,6 +1,10 @@
 """Main file for biobreak app"""
 import os
-from flask import Flask, request, render_template, flash, redirect, jsonify, g
+import urllib
+from uuid import uuid4
+from flask import Flask, request, render_template, flash, redirect, jsonify, g, abort, session
+import requests
+import requests.auth
 import geocoder
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
@@ -11,7 +15,7 @@ REDDIT_CLIENT_ID = os.environ['RedditAppClientId']
 CLIENT_SECRET = os.environ['RedditSecretKey']
 GOOGLE_MAPS = os.environ['GoogleMapsAPIkey']
 REDIRECT_URI = "http://0.0.0.0:5000/reddit_callback"
-REDDIT_USER  = "datagrl"
+REDDIT_USER  = "datagrl" # get your own reddit user account
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'seek_rhett'
@@ -28,7 +32,6 @@ def index():
     """Return homepage or query results"""
     return render_template("index.html")
 
-
 @app.route('/index_maps.json')
 def get_maps():
     """return markers to map"""
@@ -41,9 +44,12 @@ def get_maps():
         g_loc = geocoder.google(location)
 
     latlng = g_loc.latlng
+
     point = "POINT({lng} {lat})".format(lat=latlng[0],lng=latlng[1])
-    query = db.session.query(Location).filter(func.ST_Distance_Sphere( \
+    query = db.session.query(Location).order_by(func.ST_Distance_Sphere( \
+            point, Location.lnglat) < 10000).filter(func.ST_Distance_Sphere( \
             point, Location.lnglat) < 10000).limit(5).all()
+
     for rec in query:
         data = {"lat": rec.latitude, "lng": rec.longitude, \
                 "name": rec.bathrooms.name, "address": rec.street, \
@@ -59,21 +65,28 @@ def login():
     """Sends user to the login/create account page"""
     return render_template("login.html")
 
+@app.route('/logout')
+def logout():
+    """log user out"""
+    session.pop('displayname', None)
+    return render_template("index.html")
+
 @app.route('/login_validate', methods=['POST'])
 def login_validate():
     """validate users login credentials"""
     email = request.form.get('login_email')
     password = request.form.get('login_password')
     rem = request.form.get('rem')
-    import pdb; pdb.set_trace()
 
     # check if email/password are in db
     verify_acct = User.verify_password(email, password)
     if verify_acct:
         # if rem == 'checked':
         #     # create cookie for user
-        #     pass
-        # Session['user_id'] = rec.user_id
+        display_name = db.session.query(User.display_name).filter_by(
+            email=email).first()[0]
+        session['displayname'] = display_name
+
         return redirect('/')
     else:
         msg = flash("Login Failed")
@@ -89,7 +102,7 @@ def create_acct():
     pword = request.form.get('password')
 
     hashedpw = User.set_password(pword)
-    new_user = User(fname, lname, email, hashedpw, dname)
+    new_user = User(fname=fname, lname=lname, email=email, pword=hashedpw, display_name=dname)
     db.session.add(new_user)
     db.session.commit()
     return redirect('/')
@@ -107,51 +120,55 @@ def check_acct():
 
     return jsonify(status)
 
+# start Reddit OAuth2
+@app.route('/login_auth')
+def login_auth():
+    """Send user to Reddit for authorization"""
+    text = '<a href="%s">Authenticate with reddit</a>'
+    return text % make_authorization_url()
+
+def make_authorization_url():
+    """
+        Generate a random string for the state parameter
+        Save it for use later to prevent xsrf attacks
+    """
+    from uuid import uuid4
+    state = str(uuid4())
+    save_created_state(state)
+    params = {"client_id": REDDIT_CLIENT_ID,
+              "response_type": "code",
+              "state": state,
+              "redirect_uri": REDIRECT_URI,
+              "duration": "temporary",
+              "scope": "identity"}
+
+    url = "https://ssl.reddit.com/api/v1/authorize?" + urllib.urlencode(params)
+    return url
 
 
-# OAuth2 for Reddit
-# @app.route('/login_auth')
-# def login_auth():
-#   """Send user to Reddit for authorization"""
-#   text = '<a href="%s">Authenticate with reddit</a>'
-#   return text % make_authorization_url()
+def save_created_state(state):
+    """Save credential to db"""
+    pass
 
-# def make_authorization_url():
-#   # Generate a random string for the state parameter
-#   # Save it for use later to prevent xsrf attacks
-#   from uuid import uuid4
-#   state = str(uuid4())
-#   save_created_state(state)
-#   params = {"client_id": CLIENT_ID,
-#         "response_type": "code",
-#         "state": state,
-#         "redirect_uri": REDIRECT_URI,
-#         "duration": "temporary",
-#         "scope": "identity"}
 
-#   url = "https://ssl.reddit.com/api/v1/authorize?" + urllib.urlencode(params)
-#   return url
+def is_valid_state(state):
+    """check that state is valid"""
+    return True
 
-# def save_created_state(state):
-#   """Save credential to db"""
-#   pass
+@app.route('/reddit_callback')
+def reddit_callback():
+    """returned call from reddit"""
+    error = request.args.get('error', '')
+    if error:
+        return "Error: " + error
+    state = request.args.get('state', '')
+    if not is_valid_state(state):
+        # unrecognized request - deny permission
+        abort(403)
 
-# def is_valid_state(state):
-#   """check that state is valid"""
-#   return True
-
-# @app.route('/reddit_callback')
-# def reddit_callback():
-#   error = request.args.get('error', '')
-#   if error:
-#     return "Error: " + error
-#   state = request.args.get('state', '')
-#   if not is_valid_state(state):
-#     # Oh no, this request wasn't started by us!
-#     abort(403)
-#   code = request.args.get('code')
-#   # We'll change this next line in just a moment
-#   return "got a code! %s" % code
+    code = request.args.get('code')
+    # We'll change this next line in just a moment
+    return "got a code! %s" % code
 
 
 if __name__ == "__main__":

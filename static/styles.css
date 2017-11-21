@@ -42,7 +42,6 @@ body {
   background:transparent !important;
 }
 
-
 .form .body {
   position:absolute;
   overflow:hidden;
@@ -200,6 +199,15 @@ footer {
   right: -25
   position: absolute;
   text-align: right;
+}
+
+#span_noresults {
+  width: 250px;
+  top: 150px;
+  left: 300px;
+  position: absolute;
+  font-weight: bold;
+  color: red;
 }
 
 div #search {

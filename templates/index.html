@@ -6,7 +6,11 @@
     <table id="nav-top">
         <tr>
             <td>
-                <a href="/login">Log In or Create Account</a>
+                {% if 'displayname' in session %}
+                    <a id="logout" href="/logout">Log Out</a>&nbsp;Welcome, {{session['displayname']}}
+                {% else %}
+                <a id="login" href="/login">Log In or Create Account</a>
+                {% endif %}
             </td>
         </tr>
     </table>
@@ -18,6 +22,9 @@
             <input id="tbSearch" type="textbox" name="txtSearch" size="50">
             <input id="btSubmit" type="button" name="btnSubmit" value="Go">
         </form>
+    </div>
+    <div id="noresults">
+        <span id="span_noresults">&nbsp;</span>
     </div>
     <div id="map_wrapper">
         <div id="map_canvas" class="mapping"></div>
@@ -67,6 +74,11 @@
         function mapResults(results) {
             console.log("mapResults");
             let data = results["data"]
+            if ( data.length == 0 ) {
+                console.log("mapResult IF statment")
+                $('#span_noresults').text('Sorry no results were found.')
+                return;
+            }
           initMap(data);
         }
 
@@ -85,8 +97,6 @@
 
         // Google Places autocomplete
         let input = document.getElementById('tbSearch');
-        // let autocomplete = new google.maps.places.Autocomplete(input,
-        //     {types: ['(cities)']});
         let autocomplete = new google.maps.places.Autocomplete(input);
         google.maps.event.addListener(tbSearch, 'place_changed',
             function(){

@@ -3,13 +3,14 @@
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 import geoalchemy2
-from bcrypt import hashpw, gensalt
+from flask_bcrypt import Bcrypt
 from flask import Flask
 
 # PostgreSQL database connection.
 # Flask-SQLAlchemy helper library.
+app = Flask(__name__)
 db = SQLAlchemy()
-
+bcrypt = Bcrypt(app)
 
 class Bathroom(db.Model):
     """Bathroom table"""
@@ -33,7 +34,7 @@ TypeError: __init__() takes at least 2 arguments (1 given)
     user_id = db.Column(db.Integer, nullable=True, default=0)
     active = db.Column(db.Boolean, nullable=False, default=True)
     created_dt = db.Column(db.DateTime, nullable=False, default=datetime.now())
-    update_dt = db.Column(db.DateTime, nullable=False, \
+    update_dt = db.Column(db.DateTime, nullable=False,
         default=datetime.now(), onupdate=datetime.now())
     locations = db.relationship('Location', uselist=False)
 
@@ -50,7 +51,7 @@ TypeError: __init__() takes at least 2 arguments (1 given)
     def __repr__(self):
         """Provide useful representation when printed."""
         return "<Bathroom bathroom_id={} name={}>".format(self.bathroom_id, \
-                self.name)
+                    self.name)
 
 
 class User(db.Model):
@@ -89,35 +90,43 @@ TypeError: __init__() takes at least 5 arguments (2 given)
             display_name={}>".format(self.user_id, self.fname, \
             self.lname, self.email, self.display_name)
 
-    def __init__(self, fname, lname, email, pword, \
-                display_name=None, user_id=None):
-        """initial values"""
-        self.fname = fname
-        self.lname = lname
-        self.email = email
-        self.pword = self.set_password(pword)
-        self.user_id = user_id
-        if display_name:
-            self.display_name = display_name
+    # def __init__(self, fname, lname, email, pword, \
+    #             display_name=None, user_id=None):
+    #     """initial values"""
+    #     self.fname = fname
+    #     self.lname = lname
+    #     self.email = email
+    #     # self.pword = self.set_password(pword)
+    #     self.user_id = user_id
+    #     if display_name:
+    #         self.display_name = display_name
 
     @staticmethod
     def set_password(pword):
         """hash user password before storing in db"""
-        pwdhash = hashpw(pword.encode('utf-8'), gensalt())
+        # pwdhash = bcrypt.hashpw(pword.encode('utf-8'), bcrypt.gensalt(14))
+        pwdhash = bcrypt.generate_password_hash(pword)
         return pwdhash
 
     @staticmethod
     def verify_password(email, pword):
         """verify user password"""
+        # import pdb; pdb.set_trace()
+        hashedval = db.session.query(User.pword).filter_by(
+            email=email).first()[0]
 
-        cnt = db.session.query(User).filter_by(email=email,
-                                               pword=pwdhash).count()
-        # if bcrypt.checkpw(password, hashed):
-
-        if cnt == 1:
+        # try:
+        if bcrypt.check_password_hash(hashedval, pword):
             return True
         else:
+            print hashedval
+            print hashedval.encode('utf-8')
             return False
+        # except:
+        #     print "bcrypt.checkpw failed (model.py)"
+        #     print pword.encode('utf-8')
+        #     print hashedval
+
 
 class Location(db.Model):
     """Locations table"""
@@ -239,7 +248,6 @@ if __name__ == "__main__":
     # you in a state of being able to work with the database directly.
 
     # from server import app
-    app = Flask(__name__)
 
     connect_to_db(app)
     db.create_all()
