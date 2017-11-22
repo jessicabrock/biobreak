@@ -80,6 +80,10 @@ TypeError: __init__() takes at least 5 arguments (2 given)
     pword = db.Column(db.String(150), nullable=False)
     display_name = db.Column(db.String(25), nullable=True, \
         default=default_fname)
+    # auth_token => FB, Twitter, etc
+    auth_token = db.Column(db.String(255), nullable=True, unique=True)
+    # jwt_token => JSON Web Token
+    jwt_token = db.Column(db.__str__(255), nullable=True, unique=True)
     created_dt = db.Column(db.DateTime, nullable=False, default=datetime.now())
     last_login_dt = db.Column(db.DateTime, nullable=True)
     active = db.Column(db.Boolean, nullable=False, default=True)
@@ -111,21 +115,15 @@ TypeError: __init__() takes at least 5 arguments (2 given)
     @staticmethod
     def verify_password(email, pword):
         """verify user password"""
-        # import pdb; pdb.set_trace()
         hashedval = db.session.query(User.pword).filter_by(
             email=email).first()[0]
 
-        # try:
         if bcrypt.check_password_hash(hashedval, pword):
             return True
         else:
             print hashedval
             print hashedval.encode('utf-8')
             return False
-        # except:
-        #     print "bcrypt.checkpw failed (model.py)"
-        #     print pword.encode('utf-8')
-        #     print hashedval
 
 
 class Location(db.Model):
@@ -237,7 +235,7 @@ def connect_to_db(app):
     """Connect the database to our Flask app."""
 
     # Configure to use our PostgreSQL database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///testdb'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///biobreak'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_ECHO'] = True
     db.app = app
@@ -248,7 +246,6 @@ if __name__ == "__main__":
     # you in a state of being able to work with the database directly.
 
     # from server import app
-
     connect_to_db(app)
     db.create_all()
     print "Connected to DB."

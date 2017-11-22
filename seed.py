@@ -1,6 +1,8 @@
 """Seed process for populating db"""
 import urllib
 import requests
+import time
+import geoalchemy2
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -36,35 +38,64 @@ def load_data():
                             longitude=v['longitude'], directions=v['directions'])
                 db.session.add(l)
                 db.session.commit()
-                # add comment
+            # add comment
             if len(v['comment']) > 1:
                 c = Comment(comment=v['comment'],
                             bathroom_id=b.bathroom_id,
                             user_id=0)
                 db.session.add(c)
                 db.session.commit()
+            # add ratings
+            if v['downvote'] == 1:
+                r = Rating(bathroom_id=b.bathroom_id,
+                           user_id= 0,
+                           score=2)
+            elif v['upvote'] == 1:
+                r = Rating(bathroom_id=b.bathroom_id,
+                           user_id= 0,
+                           score=5)
+
+            db.session.add(r)
+            db.session.commit()
+            time.sleep(1)
         else:
             break
 
     return "finished loading data"
 
-# test that data is there
-result = db.session.query(Bathroom.name).first()
-print result[0] # pragma: no cover
+def setup():
+    with app.app_context():
+        password = User.set_password('letmein')
+        u = User(user_id=0, fname="refuge", lname="restrooms", \
+            email="whatever@refugerestrooms.com", pword=password)
+        db.session.add(u)
+        db.session.commit()
 
 if __name__ == '__main__':
     import os
     app = Flask(__name__)
-    os.system("dropdb testdb")
-    os.system("createdb testdb")
+    os.system("dropdb biobreak")
+    os.system("createdb biobreak")
+    import subprocess
+    try:
+        subprocess.check_call([
+            'psql', '-q',
+            '-U', 'vagrant',
+            '-f', '/home/vagrant/src/projects/biobreak/cr_ext.sql',
+            'biobreak'
+        ])
+    except subprocess.CalledProcessError, ex:
+        print "Failed to invoke psql: {}".format(ex)
 
     connect_to_db(app)
-
     # Make our tables
     db.create_all()
-    u = User(user_id=0, fname="refuge", lname="restrooms", \
-            email="whatever@refugerestrooms.com", pword="letmein")
-    db.session.add(u)
-    db.session.commit()
-    # load data into db
+    # create default user needed to seed data
+    setup()
+
+    # load data from API into db
     load_data()
+    # test that data is there
+    print "verify we have data:"
+    result = db.session.query(Bathroom.name).first()
+    print result[0] # pragma: no cover
