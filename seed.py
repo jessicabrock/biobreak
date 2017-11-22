@@ -76,6 +76,7 @@ if __name__ == '__main__':
     app = Flask(__name__)
     os.system("dropdb biobreak")
     os.system("createdb biobreak")
+    # create extension postgis
     import subprocess
     try:
         subprocess.check_call([

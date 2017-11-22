@@ -15,7 +15,7 @@ REDDIT_CLIENT_ID = os.environ['RedditAppClientId']
 CLIENT_SECRET = os.environ['RedditSecretKey']
 GOOGLE_MAPS = os.environ['GoogleMapsAPIkey']
 REDIRECT_URI = "http://0.0.0.0:5000/reddit_callback"
-REDDIT_USER  = "datagrl" # get your own reddit user account
+REDDIT_USER = os.environ("REDDIT_USER")
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'seek_rhett'
@@ -120,7 +120,7 @@ def check_acct():
 
     return jsonify(status)
 
-# start Reddit OAuth2
+# Reddit OAuth2
 @app.route('/login_auth')
 def login_auth():
     """Send user to Reddit for authorization"""
