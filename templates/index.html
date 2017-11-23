@@ -58,7 +58,11 @@
                 '<h3>' + results[i]["name"] + '</h3>' +
                 '<p>' + results[i]["address"] + '</br>' +
                 results[i]["city"] + ', ' + results[i]["state"] +
-                '</br></br>' + results[i]["directions"] + '</p></div>');
+                '</br></br><h4>Directions</h4>' + results[i]["directions"] +
+                '<h4>Comments</h4>' + 'Coming Soon...' +
+                '<h4>Ratings</h4>' + 'Comming Soon' + '<br/><br/>' +
+                '<a href="#">View Details</a>' +
+                '</p></div>');
 
                 // Allow each marker to have an info window
                 google.maps.event.addListener(marker, 'click', (function(marker, i) {

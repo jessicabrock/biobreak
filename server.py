@@ -15,7 +15,7 @@ REDDIT_CLIENT_ID = os.environ['RedditAppClientId']
 CLIENT_SECRET = os.environ['RedditSecretKey']
 GOOGLE_MAPS = os.environ['GoogleMapsAPIkey']
 REDIRECT_URI = "http://0.0.0.0:5000/reddit_callback"
-REDDIT_USER = os.environ("REDDIT_USER")
+REDDIT_USER = os.environ['RedditUser']
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'seek_rhett'
@@ -132,19 +132,21 @@ def make_authorization_url():
         Generate a random string for the state parameter
         Save it for use later to prevent xsrf attacks
     """
-    from uuid import uuid4
+    # email = request.form.get('login_email')
+    # password = request.form.get('login_password')
+    #hashedpw = User.set_password(password)
     state = str(uuid4())
+    # displayname = get_username(access_token)
     save_created_state(state)
     params = {"client_id": REDDIT_CLIENT_ID,
               "response_type": "code",
               "state": state,
               "redirect_uri": REDIRECT_URI,
-              "duration": "temporary",
+              "duration": "permanent",
               "scope": "identity"}
 
     url = "https://ssl.reddit.com/api/v1/authorize?" + urllib.urlencode(params)
     return url
-
 
 def save_created_state(state):
     """Save credential to db"""
@@ -153,7 +155,10 @@ def save_created_state(state):
 
 def is_valid_state(state):
     """check that state is valid"""
-    return True
+    if state != None:
+        return True
+    else:
+        return False
 
 @app.route('/reddit_callback')
 def reddit_callback():
@@ -167,8 +172,28 @@ def reddit_callback():
         abort(403)
 
     code = request.args.get('code')
-    # We'll change this next line in just a moment
-    return "got a code! %s" % code
+    access_token = get_token(code)
+    displayname = get_username(access_token)
+    return "Your reddit username is: {}".format(get_username(access_token))
+
+def get_token(code):
+    client_auth = requests.auth.HTTPBasicAuth(REDDIT_CLIENT_ID, CLIENT_SECRET)
+    post_data = {"grant_type": "authorization_code",
+                 "code": code,
+                 "redirect_uri": REDIRECT_URI}
+    response = requests.post("https://ssl.reddit.com/api/v1/access_token",
+                             auth=client_auth,
+                             data=post_data)
+    token_json = response.json()
+    print token_json
+    return token_json["access_token"]
+
+def get_username(access_token):
+    headers = {"Authorization": "bearer " + access_token}
+    response = requests.get("https://oauth.reddit.com/api/v1/me",
+        headers=headers)
+    me_json = response.json()
+    return me_json['name']
 
 
 if __name__ == "__main__":

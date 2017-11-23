@@ -80,13 +80,13 @@ TypeError: __init__() takes at least 5 arguments (2 given)
     pword = db.Column(db.String(150), nullable=False)
     display_name = db.Column(db.String(25), nullable=True, \
         default=default_fname)
-    # auth_token => FB, Twitter, etc
-    auth_token = db.Column(db.String(255), nullable=True, unique=True)
-    # jwt_token => JSON Web Token
-    jwt_token = db.Column(db.__str__(255), nullable=True, unique=True)
     created_dt = db.Column(db.DateTime, nullable=False, default=datetime.now())
     last_login_dt = db.Column(db.DateTime, nullable=True)
     active = db.Column(db.Boolean, nullable=False, default=True)
+    # auth_token => FB, Twitter, etc
+    auth_token = db.Column(db.String(255), nullable=True, unique=True)
+    # # jwt_token => JSON Web Token
+    jwt_token = db.Column(db.String(255), nullable=True, unique=True)
 
     def __repr__(self):
         """Provide useful representation when printed."""
@@ -235,7 +235,7 @@ def connect_to_db(app):
     """Connect the database to our Flask app."""
 
     # Configure to use our PostgreSQL database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///biobreak'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///testdb'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_ECHO'] = True
     db.app = app

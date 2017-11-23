@@ -45,7 +45,12 @@
            <i class="fa fa-reddit"></i> Login with Reddit
           </div> -->
           <div class="social-form reddit">
-            <i class="fa fa-reddit"></i> Login with Reddit
+          <i class="fa fa-reddit"></i>
+            <form id="loginReddit" action="/login_auth">
+              <div class="social-form reddit">
+                <span onclick="return validateForm1()">Login with Reddit</span>
+              </div>
+          </form>
           </div>
           <!-- <div class="social-form fa-git">
             <i class="fa fa-git"></i> Login with GitHub
@@ -122,7 +127,7 @@
       $.get("/check_email_exists.json", data, registerUser);
     }
 
-    function validateForm1(){
+    function validateForm1() {
       let email = $('#login_email').val();
       let password = $('#login_password').val();
       let rem = $('#rem').is(':checked') /* checked or unchecked */

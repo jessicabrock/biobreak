@@ -11,6 +11,10 @@ from model import Bathroom, User, Location, Rating, Comment, db, connect_to_db
 def load_data():
     """pull data from API and load into db"""
     page_num = 1
+    # if type(num) == int:
+    #     url = "https://refugerestrooms.org:443/api/v1/restrooms.json?page=1&per_page=" + str(page_num)
+    # else:
+    #     pass
 
     while True:
         url = "https://www.refugerestrooms.org:443/api/v1/restrooms.json?per_page=100&page=" + str(page_num)

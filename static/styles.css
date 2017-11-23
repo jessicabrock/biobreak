@@ -162,6 +162,7 @@ body {
 }*/
 .form .body .footer .reddit {
   background: red;
+  text-align: center;
 }
 /*.form .body .footer .git {
   background: grey;
