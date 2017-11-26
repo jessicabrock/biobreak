@@ -2,3 +2,5 @@
 shhhhh.sh
 env/
 .DS_Store
+tests
+tmp

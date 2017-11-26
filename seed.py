@@ -54,13 +54,15 @@ def load_data():
                 r = Rating(bathroom_id=b.bathroom_id,
                            user_id= 0,
                            score=2)
+                db.session.add(r)
+                db.session.commit()
             elif v['upvote'] == 1:
                 r = Rating(bathroom_id=b.bathroom_id,
                            user_id= 0,
                            score=5)
+                db.session.add(r)
+                db.session.commit()
 
-            db.session.add(r)
-            db.session.commit()
             time.sleep(1)
         else:
             break
