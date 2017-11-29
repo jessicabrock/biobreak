@@ -9,13 +9,13 @@ import geocoder
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 from geoalchemy2 import Geography, WKTElement
-from model import User, Bathroom, Location, Comment, Rating, db, connect_to_db
+from model import User, Bathroom, Location, Comment, Rating, db, connect_to_db, BathroomData
 
 REDDIT_CLIENT_ID = os.environ['RedditAppClientId']
 CLIENT_SECRET = os.environ['RedditSecretKey']
 GOOGLE_MAPS = os.environ['GoogleMapsAPIkey']
 REDIRECT_URI = "http://0.0.0.0:5000/reddit_callback"
-REDDIT_USER = os.environ['RedditUser']
+# REDDIT_USER = os.environ['RedditUser']
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'seek_rhett'
@@ -46,13 +46,16 @@ def get_maps():
     latlng = g_loc.latlng
 
     point = "POINT({lng} {lat})".format(lat=latlng[0],lng=latlng[1])
-    query = db.session.query(Location).order_by(func.ST_Distance_Sphere( \
-            point, Location.lnglat) < 10000).filter(func.ST_Distance_Sphere( \
-            point, Location.lnglat) < 10000).limit(5).all()
+    # query = db.session.query(Location).order_by(func.ST_Distance_Sphere( \
+    #         point, Location.lnglat) < 10000).filter(func.ST_Distance_Sphere( \
+    #         point, Location.lnglat) < 10000).limit(5).all()
+
+    query = db.session.query(BathroomData).order_by(func.ST_Distance_Sphere( \
+            point, BathroomData.lnglat) < 10000).filter(func.ST_Distance_Sphere( point, BathroomData.lnglat) < 10000).limit(5).all()
 
     for rec in query:
         data = {"lat": rec.latitude, "lng": rec.longitude, \
-                "name": rec.bathrooms.name, "address": rec.street, \
+                "name": rec.name, "address": rec.street, \
                 "city": rec.city, "state": rec.state, \
                 "directions": rec.directions}
         lst.append(data)

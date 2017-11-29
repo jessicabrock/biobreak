@@ -12,6 +12,34 @@ app = Flask(__name__)
 db = SQLAlchemy()
 bcrypt = Bcrypt(app)
 
+class BathroomData(db.Model):
+    """View of v_bathroom_data"""
+    __tablename__ = "v_bathroom_data"
+
+    bathroom_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150))
+    unisex = db.Column(db.Boolean)
+    accessible = db.Column(db.Boolean)
+    changing_table = db.Column(db.Boolean)
+    street = db.Column(db.String(155))
+    city = db.Column(db.String(50))
+    state = db.Column(db.String(50))
+    country = db.Column(db.String(50))
+    lnglat = db.Column(geoalchemy2.Geometry(geometry_type='POINT', srid=4326))
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+    directions = db.Column(db.String(2000))
+    comment = db.Column(db.String(1024))
+    user_id = db.Column(db.Integer)
+    score = db.Column(db.Integer)
+
+    def __repr__(self):
+        """Provide useful representation when printed."""
+        return ("{} {} {} {} {} {} {} {} {} {} {} {} {} {} {}".format(self.__class__.__name__, self.bathroom_id,
+            self.name, self.unisex, self.accessible, self.changing_table,
+            self.street, self.city, self.state, self.country, self.latitude,
+            self.longitude, self.comment, self.user_id, self.score) )
+
 class Bathroom(db.Model):
     """Bathroom table"""
 
@@ -80,13 +108,11 @@ TypeError: __init__() takes at least 5 arguments (2 given)
     pword = db.Column(db.String(150), nullable=False)
     display_name = db.Column(db.String(25), nullable=True, \
         default=default_fname)
-     # auth_token => FB, Twitter, etc
-    auth_token = db.Column(db.String(255), nullable=True, unique=True)
-    # # jwt_token => JSON Web Token
-    jwt_token = db.Column(db.String(255), nullable=True, unique=True)
     created_dt = db.Column(db.DateTime, nullable=False, default=datetime.now())
     last_login_dt = db.Column(db.DateTime, nullable=True)
     active = db.Column(db.Boolean, nullable=False, default=True)
+    # auth_token => FB, Twitter, etc
+    auth_token = db.Column(db.String(255), nullable=True, unique=True)
 
     def __repr__(self):
         """Provide useful representation when printed."""
