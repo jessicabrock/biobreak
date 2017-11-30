@@ -56,26 +56,28 @@
                     map: map
                 });
 
+                let lst_comments = "";
+                for (let data of results[i]["comments"]) {
+                    lst_comments += ('<li>' + data + '</li>')
+                }
+                if (lst_comments === "") {
+                    lst_comments = "No comments";
+                }
+
                 let content = $('<div style="height: 600px;" class="info_content">' +
                 '<h3>' + results[i]["name"] + '</h3>' +
                 '<p>' + results[i]["address"] + '</br>' +
                 results[i]["city"] + ', ' + results[i]["state"] +
                 '</br></br><h4>Directions</h4>' + results[i]["directions"] +
-                '<h4>Comments</h4>' + 'Coming Soon...' +
+                '<h4>Comments</h4>' +
+                '<ul id="comments">' + lst_comments + '</ul>' +
                 '<h4>Ratings</h4>' + 'Comming Soon' + '<br/><br/>' +
-                '<a href="#">View Details</a>' +
+                '<a href="#">Edit Details</a>' +
                 '</p></div>');
 
+
+
                 infoWindowContent.push(content[0]);
-                // infoWindowContent.push('<div style="height: 600px;" class="info_content">' +
-                // '<h3>' + results[i]["name"] + '</h3>' +
-                // '<p>' + results[i]["address"] + '</br>' +
-                // results[i]["city"] + ', ' + results[i]["state"] +
-                // '</br></br><h4>Directions</h4>' + results[i]["directions"] +
-                // '<h4>Comments</h4>' + 'Coming Soon...' +
-                // '<h4>Ratings</h4>' + 'Comming Soon' + '<br/><br/>' +
-                // '<a href="#">View Details</a>' +
-                // '</p></div>');
 
                 // Allow each marker to have an info window
                 google.maps.event.addListener(marker, 'click', (function(marker, i) {

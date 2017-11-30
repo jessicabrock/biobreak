@@ -46,18 +46,19 @@ def get_maps():
     latlng = g_loc.latlng
 
     point = "POINT({lng} {lat})".format(lat=latlng[0],lng=latlng[1])
-    # query = db.session.query(Location).order_by(func.ST_Distance_Sphere( \
-    #         point, Location.lnglat) < 10000).filter(func.ST_Distance_Sphere( \
-    #         point, Location.lnglat) < 10000).limit(5).all()
 
     query = db.session.query(BathroomData).order_by(func.ST_Distance_Sphere( \
             point, BathroomData.lnglat) < 10000).filter(func.ST_Distance_Sphere( point, BathroomData.lnglat) < 10000).limit(5).all()
 
     for rec in query:
-        data = {"lat": rec.latitude, "lng": rec.longitude, \
+        qry_comments = db.session.query(Comment).filter(Comment.bathroom_id==rec.bathroom_id).all()
+        data = {"bathroom_id": rec.bathroom_id,
+                "lat": rec.latitude, "lng": rec.longitude, \
                 "name": rec.name, "address": rec.street, \
                 "city": rec.city, "state": rec.state, \
-                "directions": rec.directions}
+                "directions": rec.directions,
+                "comments": [comment.comment for comment in qry_comments]}
+
         lst.append(data)
     results = {"data": lst}
 
@@ -123,11 +124,17 @@ def check_acct():
 
     return jsonify(status)
 
+@app.route('/add_bathroom')
+def _add_bathroom():
+    """Add a new bathroom"""
+    return render_template("add_bathroom.html")
+
 # Reddit OAuth2
 @app.route('/login_auth')
 def login_auth():
     """Send user to Reddit for authorization"""
     text = '<a href="%s">Authenticate with reddit</a>'
+    print text
     return text % make_authorization_url()
 
 def make_authorization_url():
@@ -149,6 +156,7 @@ def make_authorization_url():
               "scope": "identity"}
 
     url = "https://ssl.reddit.com/api/v1/authorize?" + urllib.urlencode(params)
+    print url
     return url
 
 def save_created_state(state):
@@ -161,6 +169,7 @@ def is_valid_state(state):
     if state != None:
         return True
     else:
+        print "is_valid_state false"
         return False
 
 @app.route('/reddit_callback')
@@ -177,6 +186,7 @@ def reddit_callback():
     code = request.args.get('code')
     access_token = get_token(code)
     displayname = get_username(access_token)
+    print displayname
     return "Your reddit username is: {}".format(get_username(access_token))
 
 def get_token(code):

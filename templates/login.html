@@ -3,7 +3,12 @@
 {% block title %}Login or Create an Account{% endblock %}
 {% block content %}
   <div id="nav-home">
-    <a href="/">Home</a>
+    <a href="/">Home</a>&nbsp;
+    {% if 'displayname' in session %}
+        <a id="logout" href="/logout">Log Out</a>&nbsp;Welcome, {{session['displayname']}}
+    {% else %}
+        <a id="login" href="/add_bathroom">Add a Bathroom</a>
+    {% endif %}
   </div>
   <div id = "login_msg">
     <!-- span used for message failed login -->

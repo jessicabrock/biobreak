@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}BioBreak - Add a Bathroom{% endblock %}
+
+{% block content %}
+    <div id="nav-home">
+    <a href="/">Home</a>
+    {% if 'displayname' in session %}
+        <a id="logout" href="/logout">Log Out</a>&nbsp;Welcome, {{session['displayname']}}
+    {% else %}
+        <a id="login" href="/login">Log In or Create Account</a>
+    {% endif %}
+  </div>
+
+
+{% endblock %}
