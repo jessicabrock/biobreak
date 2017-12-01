@@ -5,6 +5,7 @@ from uuid import uuid4
 from flask import Flask, request, render_template, flash, redirect, jsonify, g, abort, session
 import requests
 import requests.auth
+import json
 import geocoder
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
@@ -142,17 +143,15 @@ def make_authorization_url():
         Generate a random string for the state parameter
         Save it for use later to prevent xsrf attacks
     """
-    # email = request.form.get('login_email')
-    # password = request.form.get('login_password')
-    #hashedpw = User.set_password(password)
     state = str(uuid4())
     # displayname = get_username(access_token)
     save_created_state(state)
+
     params = {"client_id": REDDIT_CLIENT_ID,
               "response_type": "code",
               "state": state,
               "redirect_uri": REDIRECT_URI,
-              "duration": "permanent",
+              "duration": "temporary",
               "scope": "identity"}
 
     url = "https://ssl.reddit.com/api/v1/authorize?" + urllib.urlencode(params)
@@ -186,25 +185,37 @@ def reddit_callback():
     code = request.args.get('code')
     access_token = get_token(code)
     displayname = get_username(access_token)
-    print displayname
-    return "Your reddit username is: {}".format(get_username(access_token))
+
+    u = User(fname="???", lname="???", \
+            email="???", pword="???", display_name=displayname,
+            auth_token=access_token)
+    db.session.add(u)
+    db.session.commit()
+    session['displayname'] = displayname
+
+    return redirect('/')
 
 def get_token(code):
     client_auth = requests.auth.HTTPBasicAuth(REDDIT_CLIENT_ID, CLIENT_SECRET)
     post_data = {"grant_type": "authorization_code",
                  "code": code,
                  "redirect_uri": REDIRECT_URI}
+    headers = {"user-agent": "chrome"}
     response = requests.post("https://ssl.reddit.com/api/v1/access_token",
                              auth=client_auth,
+                             headers=headers,
                              data=post_data)
+
     token_json = response.json()
-    print token_json
+
     return token_json["access_token"]
 
 def get_username(access_token):
-    headers = {"Authorization": "bearer " + access_token}
+    headers = {"Authorization": "bearer " + access_token,
+        "user-agent": "chrome"}
     response = requests.get("https://oauth.reddit.com/api/v1/me",
         headers=headers)
+
     me_json = response.json()
     return me_json['name']
 

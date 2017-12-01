@@ -20,7 +20,7 @@
         </div>
         <form id="frmSearch" method="GET" action="/index_maps">
             <input id="tbSearch" type="textbox" name="txtSearch" size="50">
-            <input id="btSubmit" type="button" name="btnSubmit" value="Go">
+            <input id="btSubmit" type="button" name="btnSubmit" value="Flush!">
         </form>
     </div>
     <div id="noresults">
@@ -71,8 +71,10 @@
                 '</br></br><h4>Directions</h4>' + results[i]["directions"] +
                 '<h4>Comments</h4>' +
                 '<ul id="comments">' + lst_comments + '</ul>' +
-                '<h4>Ratings</h4>' + 'Comming Soon' + '<br/><br/>' +
-                '<a href="#">Edit Details</a>' +
+                '<h4>Ratings</h4>' +
+                '<form><br />' +
+                    '<input id="rating-system" type="number" class="rating" min="1" max="5" step="1">' +
+                    '</form>' +
                 '</p></div>');
 
 
@@ -84,6 +86,10 @@
                     return function() {
                         infoWindow.setContent(infoWindowContent[i]);
                         infoWindow.open(map, marker);
+                    var $input = $('input.rating');
+                    if ($input.length) {
+                        $input.removeClass('rating-loading').addClass('rating-loading').rating();
+                    }
                     }
                 })(marker, i));
 
@@ -102,6 +108,8 @@
 
         function requestData() {
             console.log("requestData");
+            let audio = new Audio('static/bath-flush3.wav');
+            audio.play();
             let frmInput = $('#tbSearch').val();
             let txt = {"searchRequest": frmInput};
             $.get("/index_maps.json",txt, mapResults);

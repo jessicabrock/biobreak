@@ -53,7 +53,9 @@
           <i class="fa fa-reddit"></i>
             <form id="loginReddit" action="/login_auth">
               <div class="social-form reddit">
-                <span onclick="return validateForm1()">Login with Reddit</span>
+                <span onclick="return validateReddit()">Login with Reddit
+                </span>
+                <!-- <span id="reddit">Login with Reddit</span> -->
               </div>
           </form>
           </div>
@@ -132,6 +134,11 @@
       $.get("/check_email_exists.json", data, registerUser);
     }
 
+    function validateReddit() {
+      let form = document.getElementById("loginReddit");
+      form.submit();
+    }
+
     function validateForm1() {
       let email = $('#login_email').val();
       let password = $('#login_password').val();
@@ -164,9 +171,9 @@
         return false;
       }
 
-      check_email_exists();
+        check_email_exists();
 
-  }
+      }
 
   $('#btnSign').click(validateForm2);
   </script>

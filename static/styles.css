@@ -9,11 +9,11 @@
 
 /* begin login css */
 body {
-  background: white;
+  background: #eeeeee;
 }
 .form {
   position:absolute;
-  top:50%;
+  top:60%;
   left:50%;
   transform:translate(-50%,-50%);
   width:480px;
@@ -179,12 +179,8 @@ body {
 /* end login css */
 
 footer {
-           /* width: 100%;
-            bottom: 0;
-            position: absolute;
             text-align: center;
-            display: inline-block;*/
-        }
+}
 
 #nav-top {
   width: 100%;
