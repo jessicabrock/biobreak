@@ -1,6 +1,7 @@
 *.pyc
+*.COV
 shhhhh.sh
-env/
+env
 .DS_Store
 tests
 tmp

@@ -254,6 +254,19 @@ class Rating(db.Model):
                 self.user_id, self.score)
 
 
+class State(db.Model):
+    """States table"""
+    __tablename__ = 'states'
+
+    state_abbr = db.Column(db.String(2), primary_key=True)
+    state_full = db.Column(db.String(50), nullable=False)
+
+    def __repr__(self):
+        """internal representation of object State"""
+        return ("{} {} {}".format(self.__class__.__name__,
+            self.state_abbr,
+            self.state_full ))
+
 ##############################################################################
 # Helper functions
 

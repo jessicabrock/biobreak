@@ -70,6 +70,7 @@ def load_data():
     return "finished loading data"
 
 def setup():
+    """create default user acct"""
     with app.app_context():
         password = User.set_password('letmein')
         u = User(user_id=0, fname="refuge", lname="restrooms", \
@@ -88,7 +89,7 @@ if __name__ == '__main__':
         subprocess.check_call([
             'psql', '-q',
             '-U', 'vagrant',
-            '-f', '/home/vagrant/src/projects/biobreak/cr_ext.sql',
+            '-f', '/home/vagrant/src/projects/biobreak/misc/cr_ext.sql',
             'biobreak'
         ])
     except subprocess.CalledProcessError, ex:

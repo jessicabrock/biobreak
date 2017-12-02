@@ -11,6 +11,14 @@
         <a id="login" href="/login">Log In or Create Account</a>
     {% endif %}
   </div>
+  <div id="add_frm">
+      <form id="frmAdd" method="GET" action="/add_bathroom">
+        <label for="txtBusName">Business Name:</label>
+        <input id="txtBusName" name="txtBusName" type="text">
+        <label for="txtAddress">Street Address:</label>
+        <input id="txtAddress" name="txtAddress" type="text">
+      </form>
+  </div>
 
 
 {% endblock %}

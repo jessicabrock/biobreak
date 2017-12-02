@@ -126,9 +126,22 @@ def check_acct():
     return jsonify(status)
 
 @app.route('/add_bathroom')
-def _add_bathroom():
+def add_bathroom():
     """Add a new bathroom"""
     return render_template("add_bathroom.html")
+
+@app.route('/get_states.json')
+def get_states():
+    """return states"""
+    states = {}
+    s = db.session.query(State).order_by(State.state_abbr).all()
+    for state in s:
+        states = {"state_abbr":s[0].state_abbr,
+                    "state_full":s[0].state_full}
+
+
+    return jsonify(states)
+
 
 # Reddit OAuth2
 @app.route('/login_auth')
