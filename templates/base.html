@@ -24,19 +24,20 @@
       <i class="fa fa-wheelchair fa-2x" aria-hidden="true"></i>
       <i class="fa fa-child fa-2x" aria-hidden="true"></i>
     </div>
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+    ...<a href="/">Home</a> |
+        {% if 'displayname' in session %}
+          <a id="logout" href="/logout">Log Out</a>&nbsp;Welcome, {{session['displayname']}}
+        {% else %}
+         <a id="login" href="/login">Sign Up or Log In</a>
+        {% endif %}
+      </div>
+    </nav>
   <!-- This is where the main content goes. -->
   {% block content %}
       BODY OF PAGE GOES HERE
   {% endblock %}
 </div>
-  <footer class="footer">
-  <hr>
-    <div class="container">
-        <span>copyright &copy; 2017 BioBreak</span>
-    </div>
-  </footer>
-  <!-- <footer class="footer">
-      copyright &copy; 2017 BioBreak
-  </footer> -->
 </body>
 </html>

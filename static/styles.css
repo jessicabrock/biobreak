@@ -10,6 +10,7 @@
 /* begin login css */
 body {
   background: #eeeeee;
+  padding-top: 70px;
 }
 .form {
   position:absolute;
@@ -178,24 +179,8 @@ body {
 
 /* end login css */
 
-footer {
-            text-align: center;
-}
-
-#nav-top {
-  width: 100%;
-  top: 60;
-  left: -25;
-  /*position: absolute;*/
-  text-align: right;
-}
-
-#nav-home {
-  width: 100%;
-  top: 60;
-  right: -25;
-  /*position: absolute;*/
-  text-align: right;
+.navbar-fixed-top {
+  background-color: #eeeeee;
 }
 
 #span_noresults {

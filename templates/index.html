@@ -3,7 +3,7 @@
 {% block title %}BioBreak - Find a Bathroom{% endblock %}
 
 {% block content %}
-    <table id="nav-top">
+    <!-- <table id="nav-top">
         <tr>
             <td>
                 {% if 'displayname' in session %}
@@ -13,7 +13,7 @@
                 {% endif %}
             </td>
         </tr>
-    </table>
+    </table> -->
     <div id="search">
         <div id="subhead">
             Find a gender neutral, disability accessible or changing table bathroom
@@ -119,8 +119,8 @@
 
         function requestData() {
             console.log("requestData");
-            let audio = new Audio('static/bath-flush3.wav');
-            audio.play();
+            // let audio = new Audio('static/bath-flush3.wav');
+            // audio.play();
             let frmInput = $('#tbSearch').val();
             let txt = {"searchRequest": frmInput};
             $.get("/index_maps.json",txt, mapResults);
@@ -141,5 +141,5 @@
       })
 
 </script>
-
 {% endblock %}
+
