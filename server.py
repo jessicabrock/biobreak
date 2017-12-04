@@ -54,10 +54,13 @@ def get_maps():
     for rec in query:
         qry_comments = db.session.query(Comment).filter(Comment.bathroom_id==rec.bathroom_id).all()
         data = {"bathroom_id": rec.bathroom_id,
-                "lat": rec.latitude, "lng": rec.longitude, \
-                "name": rec.name, "address": rec.street, \
-                "city": rec.city, "state": rec.state, \
+                "lat": rec.latitude, "lng": rec.longitude,
+                "name": rec.name, "address": rec.street,
+                "city": rec.city, "state": rec.state,
                 "directions": rec.directions,
+                "unisex": rec.unisex,
+                "accessible": rec.accessible,
+                "changing_table": rec.changing_table,
                 "comments": [comment.comment for comment in qry_comments]}
 
         lst.append(data)
@@ -134,13 +137,11 @@ def add_bathroom():
 def get_states():
     """return states"""
     states = {}
-    s = db.session.query(State).order_by(State.state_abbr).all()
+    s = db.session.query(State).all()
     for state in s:
-        states = {"state_abbr":s[0].state_abbr,
-                    "state_full":s[0].state_full}
+        states[state.state_abbr] = state.state_full
 
-
-    return jsonify(states)
+    return jsonify(sorted(states))
 
 
 # Reddit OAuth2

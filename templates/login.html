@@ -2,14 +2,6 @@
 
 {% block title %}Login or Create an Account{% endblock %}
 {% block content %}
-  <!-- <div id="nav-home">
-    <a href="/">Home</a>&nbsp;
-    {% if 'displayname' in session %}
-        <a id="logout" href="/logout">Log Out</a>&nbsp;Welcome, {{session['displayname']}}
-    {% else %}
-        <a id="login" href="/add_bathroom">Add a Bathroom</a>
-    {% endif %}
-  </div>  -->
   <div id = "login_msg">
     <!-- span used for message failed login -->
     <span id = "span_login_msg">
@@ -47,16 +39,12 @@
           <span>OR</span>
         </div>
         <div class="footer">
-          <!-- <div class="reddit-auth">
-           <i class="fa fa-reddit"></i> Login with Reddit
-          </div> -->
           <div class="social-form reddit">
           <i class="fa fa-reddit"></i>
             <form id="loginReddit" action="/login_auth">
               <div class="social-form reddit">
                 <span onclick="return validateReddit()">Login with Reddit
                 </span>
-                <!-- <span id="reddit">Login with Reddit</span> -->
               </div>
           </form>
           </div>

@@ -3,24 +3,13 @@
 {% block title %}BioBreak - Find a Bathroom{% endblock %}
 
 {% block content %}
-    <!-- <table id="nav-top">
-        <tr>
-            <td>
-                {% if 'displayname' in session %}
-                    <a id="logout" href="/logout">Log Out</a>&nbsp;Welcome, {{session['displayname']}}
-                {% else %}
-                <a id="login" href="/login">Log In or Create Account</a>
-                {% endif %}
-            </td>
-        </tr>
-    </table> -->
     <div id="search">
         <div id="subhead">
             Find a gender neutral, disability accessible or changing table bathroom
         </div>
         <form id="frmSearch" method="GET" action="/index_maps">
             <input id="tbSearch" type="textbox" name="txtSearch" size="50">
-            <input id="btSubmit" type="button" name="btnSubmit" value="Flush!">
+            <input id="btSubmit" type="button" name="btnSubmit" value="Search">
         </form>
     </div>
     <div id="noresults">
@@ -36,7 +25,8 @@
           function initMap(results) {
             console.log("initMap");
             let map = new google.maps.Map(document.getElementById('map_canvas'), {
-              zoom: 4,
+              zoom: 10,
+              gestureHandling: 'cooperative',
               mapTypeId: 'roadmap',
               // user last lat/lng for center
               center: new google.maps.LatLng(results[4]["lat"], results[4]["lng"])
@@ -65,18 +55,18 @@
                 }
 
                 let symbols = "";
-                if ( results.unisex ) {
+                if ( results[i]["unisex"] === true ) {
                     symbols = '<i class="fa fa-transgender-alt" aria-hidden="true"></i>'
                 }
-                if ( results.accessible ) {
-                    symbols = symbols + 'i class="fa fa-wheelchair" aria-hidden="true"></i>'
+                if ( results[i]["accessible"] === true ) {
+                    symbols = symbols + '<i class="fa fa-wheelchair" aria-hidden="true"></i>'
                 }
-                if ( results.changing_table ) {
+                if ( results[i]["changing_table"] === true) {
                     symbols = symbols + ' <i class="fa fa-child" aria-hidden="true"></i>'
                 }
 
                 let content = $('<div style="height: 600px;" class="info_content">' +
-                '<h3>' + results[i]["name"] + '</h3>' +
+                '<h3>' + results[i]["name"] + '&nbsp;' + symbols + '</h3>' +
                 '<p>' + results[i]["address"] + '</br>' +
                 results[i]["city"] + ', ' + results[i]["state"] +
                 '</br></br><h4>Directions</h4>' + results[i]["directions"] +
