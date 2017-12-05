@@ -214,13 +214,14 @@ div #search {
 
 #tbSearch {
   border-style: solid;
-  border-color: gray;
+  border-color: black;
   background-color: #eeeeee;
 }
 
 #btSubmit {
-  font-family: Helvetica, Arial, sans-serif
+  font-family: 'Roboto', Helvetica, sans-serif;
   font-weight: bold;
+  border-color: black;
   color: #000000;
 }
 

@@ -9,7 +9,7 @@ This is a student project I made while attending Hackbright Academy in San Franc
 
 ### Want to use this project?
 
-#### Basics
+## Basics
 
 1. Fork/Clone
 1. Activate a virtualenv or use Amazon's Cloud 9
@@ -17,3 +17,10 @@ This is a student project I made while attending Hackbright Academy in San Franc
 1. You will need to get your own Reddit and Google API keys
 
 No warranties or expressed or implied.
+
+## Screen Shots
+
+<p align="center">
+  <img src="img/biobreak_sreenshot_home.png" width="350"/>
+  <img src="img/biobreak_sreenshot_login.png" width="350"/>
+</p>
