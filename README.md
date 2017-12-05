@@ -21,6 +21,6 @@ No warranties or expressed or implied.
 ## Screen Shots
 
 <p align="center">
-  <img src="img/biobreak_sreenshot_home.png" width="350"/><br />
-  <img src="img/biobreak_sreenshot_login.png" width="350"/>
+  <img src="img/biobreak_screenshot_home.png" width="350"/><br />
+  <img src="img/biobreak_screenshot_login.png" width="350"/>
 </p>
