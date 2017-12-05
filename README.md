@@ -1,5 +1,5 @@
 # Bio Break
-<p align="center">
+<p align="left">
   <img src="static/gend-neutral.png"/>&nbsp;
   <img src="static/wheelchair.png"/>&nbsp;
   <img src="static/chng_table.png"/>
