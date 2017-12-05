@@ -1,4 +1,9 @@
 # Bio Break
+<p align="center">
+  <img src="static/gend-neutral.png"/>&nbsp;
+  <img src="static/wheelchair.png"/>&nbsp;
+  <img src="static/chng_table.png"/>
+</p>
 
 This is a student project I made while attending Hackbright Academy in San Francisco. Web app to find public bathrooms: gender neutral, disability accessible and child changing table.
 
