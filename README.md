@@ -34,9 +34,9 @@ No warranties or expressed or implied.
 ## Future Additions
 
 1. Add a bathroom
-2. Edit all data fields
+1. Edit all data fields
 
 ## Contract Info
 
-LinkedIn: https://www.linkedin.com/in/jess-brock/
-https://jessicabrock.net/
+1. LinkedIn: https://www.linkedin.com/in/jess-brock/
+1. https://jessicabrock.net/
