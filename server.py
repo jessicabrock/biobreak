@@ -16,7 +16,6 @@ REDDIT_CLIENT_ID = os.environ['RedditAppClientId']
 CLIENT_SECRET = os.environ['RedditSecretKey']
 GOOGLE_MAPS = os.environ['GoogleMapsAPIkey']
 REDIRECT_URI = "http://0.0.0.0:5000/reddit_callback"
-# REDDIT_USER = os.environ['RedditUser']
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'seek_rhett'
@@ -39,12 +38,18 @@ def get_maps():
     data = {}
     lst = []
     location = request.args.get("searchRequest")
+    ip_address = request.environ['REMOTE_ADDR']
+
+    g_loc = geocoder.ip(ip_address)
+
     if location == "":
-        g_loc = geocoder.google("683 Sutter St., San Francisco, CA")
+        g_loc = geocoder.ip(ip_address)
     else:
         g_loc = geocoder.google(location)
 
     latlng = g_loc.latlng
+    import pdb; pdb.set_trace()
+    print "latlng: " + str(latlng)
 
     point = "POINT({lng} {lat})".format(lat=latlng[0],lng=latlng[1])
 
@@ -200,11 +205,11 @@ def reddit_callback():
     access_token = get_token(code)
     displayname = get_username(access_token)
 
-    u = User(fname="???", lname="???", \
-            email="???", pword="???", display_name=displayname,
-            auth_token=access_token)
-    db.session.add(u)
-    db.session.commit()
+    # u = User(fname="???", lname="???", \
+    #         email="???", pword="???", display_name=displayname,
+    #         auth_token=access_token)
+    # db.session.add(u)
+    # db.session.commit()
     session['displayname'] = displayname
 
     return redirect('/')
