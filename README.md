@@ -39,4 +39,4 @@ No warranties or expressed or implied.
 ## Contract Info
 
 1. LinkedIn: https://www.linkedin.com/in/jess-brock/
-1. https://jessicabrock.net/
+1. https://jessicabrock.github.io
